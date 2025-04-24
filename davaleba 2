@@ -1,0 +1,69 @@
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
+
+function DiceGameApp() {
+  const [playerOne, setPlayerOne] = useState('');
+  const [playerTwo, setPlayerTwo] = useState('');
+  const [targetScore, setTargetScore] = useState('');
+  const [gameStarted, setGameStarted] = useState(false);
+  const [scores, setScores] = useState({ მოთამაშე1: 0, მოთამაშე2: 0 });
+  const [currentPlayer, setCurrentPlayer] = useState('მოთამაშე1');
+
+  const rollDice = () => {
+    const roll = Math.floor(Math.random() * 6) + 1;
+    const updatedScores = { ...scores, [currentPlayer]: scores[currentPlayer] + roll };
+    setScores(updatedScores);
+
+    if (updatedScores[currentPlayer] >= parseInt(targetScore)) {
+      const winnerName = currentPlayer === 'მოთამაშე 1' ? playerOne : playerTwo;
+      Alert.alert('მოგება!', `${winnerName} მოიგო თამაში!`);
+      setGameStarted(false);
+      setScores({ მოთამაშე1: 0, მოთამაშე2: 0 });
+    } else {
+      setCurrentPlayer(currentPlayer === 'მოთამაშე 1' ? 'მოთამაშე 2' : 'მოთამაშე 1');
+    }
+  };
+
+  const startNewGame = () => {
+    setScores({ მოთამაშე1: 0, მოთამაშე2: 0 });
+    setCurrentPlayer('მოთამაშე 1');
+    setGameStarted(true);
+  };
+
+  if (!gameStarted) {
+    return (
+      <View style={styles.container}>
+        <TextInput placeholder="პირველი მოთამაშის სახელი" style={styles.input} value={playerOne} onChangeText={setPlayerOne} />
+        <TextInput placeholder="მეორე მოთამაშის სახელი" style={styles.input} value={playerTwo} onChangeText={setPlayerTwo} />
+        <TextInput placeholder="მომგებიანი ქულა" style={styles.input} value={targetScore} onChangeText={setTargetScore} keyboardType="numeric" />
+        <Button title="თამაშის დაწყება" onPress={startNewGame} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text>{playerOne}: {scores.მოთამაშე1}</Text>
+      <Text>{playerTwo}: {scores.მოთამაშე2}</Text>
+      <Text>მოთამაშის ჯერია: {currentPlayer === 'მოთამაშე 1' ? playerOne : playerTwo}</Text>
+      <Button title="გაგორება" onPress={rollDice} />
+      <Button title="თავიდან დაწყება" onPress={() => setGameStarted(false)} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    marginBottom: 10,
+  },
+});
+
+export default DiceGameApp;
